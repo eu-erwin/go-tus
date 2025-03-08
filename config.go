@@ -10,7 +10,7 @@ type Config struct {
 	ChunkSize int64
 	// Resume enables resumable upload.
 	Resume bool
-	// OverridePatchMethod allow to by pass proxies sendind a POST request instead of PATCH.
+	// OverridePatchMethod allow to by pass proxies sending a POST request instead of PATCH.
 	OverridePatchMethod bool
 	// Store map an upload's fingerprint with the corresponding upload URL.
 	// If Resume is true the Store is required.

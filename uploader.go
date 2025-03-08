@@ -14,13 +14,13 @@ type Uploader struct {
 	notifyChan chan bool
 }
 
-// Subscribes to progress updates.
+// NotifyUploadProgress subscribes to progress updates.
 func (u *Uploader) NotifyUploadProgress(c chan Upload) {
 	u.uploadSubs = append(u.uploadSubs, c)
 }
 
 // Abort aborts the upload process.
-// It doens't abort the current chunck, only the remaining.
+// It doesn't abort the current chunk, only the remaining.
 func (u *Uploader) Abort() {
 	u.aborted = true
 }
@@ -43,7 +43,7 @@ func (u *Uploader) Offset() int64 {
 // Upload uploads the entire body to the server.
 func (u *Uploader) Upload() error {
 	for u.offset < u.upload.size && !u.aborted {
-		err := u.UploadChunck()
+		err := u.UploadChunk()
 
 		if err != nil {
 			return err
@@ -53,8 +53,8 @@ func (u *Uploader) Upload() error {
 	return nil
 }
 
-// UploadChunck uploads a single chunck.
-func (u *Uploader) UploadChunck() error {
+// UploadChunk uploads a single chunck.
+func (u *Uploader) UploadChunk() error {
 	data := make([]byte, u.client.Config.ChunkSize)
 
 	_, err := u.upload.stream.Seek(u.offset, 0)

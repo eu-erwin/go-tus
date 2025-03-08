@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConfingMissingStore(t *testing.T) {
+func TestConfigMissingStore(t *testing.T) {
 	c := Config{
 		ChunkSize:           1048576 * 15, // 15 MB
 		Resume:              true,
@@ -18,7 +18,7 @@ func TestConfingMissingStore(t *testing.T) {
 	assert.NotNil(t, c.Validate())
 }
 
-func TestConfingChunkSizeZero(t *testing.T) {
+func TestConfigChunkSizeZero(t *testing.T) {
 	c := Config{
 		ChunkSize:           0,
 		Resume:              false,
@@ -30,7 +30,7 @@ func TestConfingChunkSizeZero(t *testing.T) {
 	assert.NotNil(t, c.Validate())
 }
 
-func TestConfingValid(t *testing.T) {
+func TestConfigValid(t *testing.T) {
 	c := DefaultConfig()
 	assert.Nil(t, c.Validate())
 }
