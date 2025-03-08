@@ -3,7 +3,6 @@ package tus
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	netUrl "net/url"
 	"strconv"
@@ -252,7 +251,7 @@ func (c *Client) getUploadOffset(url string) (int64, error) {
 }
 
 func newClientError(res *http.Response) ClientError {
-	body, _ := ioutil.ReadAll(res.Body)
+	body, _ := io.ReadAll(res.Body)
 	return ClientError{
 		Code: res.StatusCode,
 		Body: body,
