@@ -2,7 +2,7 @@ version: '2'
 services:
   app:
     build: .
-    working_dir: /go/src/github.com/eventials/go-tus
+    working_dir: /go/src/github.com/eu-erwin/go-tus
     command: go run main.go
     volumes:
-     - .:/go/src/github.com/eventials/go-tus
+     - .:/go/src/github.com/eu-erwin/go-tus

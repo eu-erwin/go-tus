@@ -1,4 +1,4 @@
-module github.com/eventials/go-tus
+module github.com/eu-erwin/go-tus
 
 go 1.13
 
