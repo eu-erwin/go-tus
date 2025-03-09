@@ -2,6 +2,7 @@ package tus
 
 import (
 	"bytes"
+	"net/http"
 )
 
 type Uploader struct {
@@ -12,6 +13,7 @@ type Uploader struct {
 	aborted    bool
 	uploadSubs []chan Upload
 	notifyChan chan bool
+	response   *http.Response
 }
 
 // NotifyUploadProgress subscribes to progress updates.
@@ -33,6 +35,11 @@ func (u *Uploader) IsAborted() bool {
 // Url returns the upload url.
 func (u *Uploader) Url() string {
 	return u.url
+}
+
+// Response returns the pre response url.
+func (u *Uploader) Response() *http.Response {
+	return u.response
 }
 
 // Offset returns the current offset uploaded.
@@ -71,11 +78,13 @@ func (u *Uploader) UploadChunk() error {
 
 	body := bytes.NewBuffer(data[:size])
 
-	newOffset, err := u.client.uploadChunk(u.url, body, int64(size), u.offset)
+	newOffset, res, err := u.client.uploadChunk(u.url, body, int64(size), u.offset, u.upload.size)
 
 	if err != nil {
 		return err
 	}
+
+	u.response = res
 
 	u.offset = newOffset
 
@@ -107,6 +116,7 @@ func NewUploader(client *Client, url string, upload *Upload, offset int64) *Uplo
 		false,
 		nil,
 		notifyChan,
+		nil,
 	}
 
 	go uploader.broadcastProgress()

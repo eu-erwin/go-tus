@@ -1,6 +1,7 @@
 package tus
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -162,14 +163,14 @@ func (c *Client) CreateOrResumeUpload(u *Upload) (*Uploader, error) {
 
 	if err == nil {
 		return uploader, err
-	} else if (err == ErrResumeNotEnabled) || (err == ErrUploadNotFound) {
+	} else if (errors.Is(err, ErrResumeNotEnabled)) || (errors.Is(err, ErrUploadNotFound)) {
 		return c.CreateUpload(u)
 	}
 
 	return nil, err
 }
 
-func (c *Client) uploadChunk(url string, body io.Reader, size, offset int64) (int64, error) {
+func (c *Client) uploadChunk(url string, body io.Reader, size, offset, fileSize int64) (int64, *http.Response, error) {
 	var method string
 
 	if !c.Config.OverridePatchMethod {
@@ -181,7 +182,7 @@ func (c *Client) uploadChunk(url string, body io.Reader, size, offset int64) (in
 	req, err := http.NewRequest(method, url, body)
 
 	if err != nil {
-		return -1, err
+		return -1, nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/offset+octet-stream")
@@ -195,25 +196,31 @@ func (c *Client) uploadChunk(url string, body io.Reader, size, offset int64) (in
 	res, err := c.Do(req)
 
 	if err != nil {
-		return -1, err
+		return -1, nil, err
 	}
 	defer res.Body.Close()
 
 	switch res.StatusCode {
+	case 200, 201:
+		if newOffset, _ := strconv.ParseInt(res.Header.Get("Upload-Offset"), 10, 64); newOffset == fileSize {
+			return newOffset, res, nil
+		} else {
+			return -1, nil, err
+		}
 	case 204:
 		if newOffset, err := strconv.ParseInt(res.Header.Get("Upload-Offset"), 10, 64); err == nil {
-			return newOffset, nil
+			return newOffset, nil, nil
 		} else {
-			return -1, err
+			return -1, nil, err
 		}
 	case 409:
-		return -1, ErrOffsetMismatch
+		return -1, nil, ErrOffsetMismatch
 	case 412:
-		return -1, ErrVersionMismatch
+		return -1, nil, ErrVersionMismatch
 	case 413:
-		return -1, ErrLargeUpload
+		return -1, nil, ErrLargeUpload
 	default:
-		return -1, newClientError(res)
+		return -1, nil, newClientError(res)
 	}
 }
 
