@@ -71,7 +71,7 @@ func (u *Uploader) UploadChunk() error {
 
 	body := bytes.NewBuffer(data[:size])
 
-	newOffset, err := u.client.uploadChunck(u.url, body, int64(size), u.offset)
+	newOffset, err := u.client.uploadChunk(u.url, body, int64(size), u.offset)
 
 	if err != nil {
 		return err
