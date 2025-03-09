@@ -114,12 +114,12 @@ func (c *Client) CreateUpload(u *Upload) (*Uploader, error) {
 func (c *Client) resolveLocationURL(location string) (*netUrl.URL, error) {
 	baseURL, err := netUrl.Parse(c.Url)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid URL '%s'", c.Url)
+		return nil, fmt.Errorf("invalid URL '%s'", c.Url)
 	}
 
 	locationURL, err := netUrl.Parse(location)
 	if err != nil {
-		return nil, fmt.Errorf("Invalid Location header value for a Creation '%s': %s", location, err.Error())
+		return nil, fmt.Errorf("invalid Location header value for a Creation '%s': %s", location, err.Error())
 	}
 	newURL := baseURL.ResolveReference(locationURL)
 	return newURL, nil
